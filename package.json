@@ -1,0 +1,20 @@
+{
+  "name": "grocery-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "European grocery price engine: store connectors, ingredient matching, budget meal planning, cart handoff.",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node src/server.ts",
+    "smoke": "node scripts/smoke.ts",
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^5.9.3"
+  }
+}

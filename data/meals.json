@@ -1,0 +1,117 @@
+[
+  {
+    "id": "falafel-wraps", "title": "Falafel Wraps", "servings": 1, "tags": ["Fakeaway"], "kcal": 520, "minutes": 20,
+    "ingredients": [
+      { "name": "falafel", "qty": { "amount": 5, "unit": "pcs" } },
+      { "name": "tortilla wraps", "qty": { "amount": 2, "unit": "pcs" } },
+      { "name": "hummus", "qty": { "amount": 30, "unit": "g" } },
+      { "name": "cucumber", "qty": { "amount": 0.3, "unit": "pcs" } },
+      { "name": "cherry tomatoes", "qty": { "amount": 50, "unit": "g" } },
+      { "name": "lettuce", "qty": { "amount": 70, "unit": "g" } },
+      { "name": "tzatziki", "qty": { "amount": 100, "unit": "g" } },
+      { "name": "lemon", "qty": { "amount": 0.3, "unit": "pcs" } }
+    ]
+  },
+  {
+    "id": "homemade-burgers", "title": "Homemade Burgers", "servings": 1, "tags": ["Family Favs"], "kcal": 650, "minutes": 25,
+    "ingredients": [
+      { "name": "minced beef", "qty": { "amount": 150, "unit": "g" } },
+      { "name": "burger buns", "qty": { "amount": 1, "unit": "pcs" } },
+      { "name": "cheddar cheese", "qty": { "amount": 60, "unit": "g" } },
+      { "name": "red onion", "qty": { "amount": 0.25, "unit": "pcs" } },
+      { "name": "tomatoes", "qty": { "amount": 0.5, "unit": "pcs" } },
+      { "name": "lettuce", "qty": { "amount": 30, "unit": "g" } },
+      { "name": "pickles", "qty": { "amount": 40, "unit": "g" } },
+      { "name": "ketchup", "qty": { "amount": 15, "unit": "ml" } }
+    ]
+  },
+  {
+    "id": "egg-fried-rice", "title": "Egg Fried Rice", "servings": 1, "tags": ["Speedy Meals"], "kcal": 430, "minutes": 20,
+    "ingredients": [
+      { "name": "rice", "qty": { "amount": 90, "unit": "g" } },
+      { "name": "eggs", "qty": { "amount": 2, "unit": "pcs" } },
+      { "name": "frozen peas", "qty": { "amount": 60, "unit": "g" } },
+      { "name": "carrots", "qty": { "amount": 1, "unit": "pcs" } },
+      { "name": "onion", "qty": { "amount": 0.5, "unit": "pcs" } },
+      { "name": "soy sauce", "qty": { "amount": 15, "unit": "ml" }, "pantry": true },
+      { "name": "vegetable oil", "qty": { "amount": 10, "unit": "ml" }, "pantry": true }
+    ]
+  },
+  {
+    "id": "harissa-vegetables", "title": "Moroccan Harissa Vegetables", "servings": 1, "tags": ["Healthy Comfort"], "kcal": 480, "minutes": 35,
+    "ingredients": [
+      { "name": "chickpeas", "qty": { "amount": 120, "unit": "g" } },
+      { "name": "zucchini", "qty": { "amount": 0.5, "unit": "pcs" } },
+      { "name": "bell pepper", "qty": { "amount": 1, "unit": "pcs" } },
+      { "name": "red onion", "qty": { "amount": 0.5, "unit": "pcs" } },
+      { "name": "harissa", "qty": { "amount": 20, "unit": "g" } },
+      { "name": "greek yogurt", "qty": { "amount": 50, "unit": "g" } },
+      { "name": "olive oil", "qty": { "amount": 10, "unit": "ml" }, "pantry": true }
+    ]
+  },
+  {
+    "id": "buffalo-tofu-wraps", "title": "Buffalo Tofu Wraps", "servings": 1, "tags": ["Fakeaway"], "kcal": 540, "minutes": 20,
+    "ingredients": [
+      { "name": "tofu", "qty": { "amount": 140, "unit": "g" } },
+      { "name": "tortilla wraps", "qty": { "amount": 2, "unit": "pcs" } },
+      { "name": "cornflour", "qty": { "amount": 8, "unit": "g" } },
+      { "name": "chilli flakes", "qty": { "amount": 1, "unit": "g" }, "pantry": true },
+      { "name": "lettuce", "qty": { "amount": 40, "unit": "g" } },
+      { "name": "carrots", "qty": { "amount": 1, "unit": "pcs" } },
+      { "name": "mayonnaise", "qty": { "amount": 20, "unit": "g" } }
+    ]
+  },
+  {
+    "id": "pasta-bolognese", "title": "Pasta Bolognese", "servings": 1, "tags": ["Family Favs"], "kcal": 690, "minutes": 30,
+    "ingredients": [
+      { "name": "pasta", "qty": { "amount": 100, "unit": "g" } },
+      { "name": "minced beef", "qty": { "amount": 125, "unit": "g" } },
+      { "name": "canned tomatoes", "qty": { "amount": 200, "unit": "g" } },
+      { "name": "onion", "qty": { "amount": 0.5, "unit": "pcs" } },
+      { "name": "garlic", "qty": { "amount": 5, "unit": "g" } },
+      { "name": "parmesan", "qty": { "amount": 15, "unit": "g" } }
+    ]
+  },
+  {
+    "id": "chicken-rice-bowl", "title": "Chicken & Veg Rice Bowl", "servings": 1, "tags": ["Protein Packed"], "kcal": 610, "minutes": 25,
+    "ingredients": [
+      { "name": "chicken breast", "qty": { "amount": 150, "unit": "g" } },
+      { "name": "rice", "qty": { "amount": 80, "unit": "g" } },
+      { "name": "broccoli", "qty": { "amount": 120, "unit": "g" } },
+      { "name": "carrots", "qty": { "amount": 1, "unit": "pcs" } },
+      { "name": "soy sauce", "qty": { "amount": 15, "unit": "ml" }, "pantry": true },
+      { "name": "garlic", "qty": { "amount": 5, "unit": "g" } }
+    ]
+  },
+  {
+    "id": "overnight-oats", "title": "Banana Overnight Oats", "servings": 1, "tags": ["Speedy Meals"], "kcal": 390, "minutes": 5,
+    "ingredients": [
+      { "name": "oats", "qty": { "amount": 60, "unit": "g" } },
+      { "name": "milk", "qty": { "amount": 150, "unit": "ml" } },
+      { "name": "greek yogurt", "qty": { "amount": 60, "unit": "g" } },
+      { "name": "bananas", "qty": { "amount": 1, "unit": "pcs" } },
+      { "name": "honey", "qty": { "amount": 10, "unit": "g" }, "pantry": true }
+    ]
+  },
+  {
+    "id": "lentil-soup", "title": "Red Lentil Soup", "servings": 1, "tags": ["Healthy Comfort"], "kcal": 420, "minutes": 30,
+    "ingredients": [
+      { "name": "red lentils", "qty": { "amount": 80, "unit": "g" } },
+      { "name": "carrots", "qty": { "amount": 1, "unit": "pcs" } },
+      { "name": "onion", "qty": { "amount": 0.5, "unit": "pcs" } },
+      { "name": "canned tomatoes", "qty": { "amount": 150, "unit": "g" } },
+      { "name": "cumin", "qty": { "amount": 2, "unit": "g" }, "pantry": true },
+      { "name": "bread", "qty": { "amount": 2, "unit": "pcs" } }
+    ]
+  },
+  {
+    "id": "salmon-potatoes", "title": "Salmon, Potatoes & Greens", "servings": 1, "tags": ["Protein Packed"], "kcal": 640, "minutes": 30,
+    "ingredients": [
+      { "name": "salmon", "qty": { "amount": 130, "unit": "g" } },
+      { "name": "potatoes", "qty": { "amount": 250, "unit": "g" } },
+      { "name": "spinach", "qty": { "amount": 80, "unit": "g" } },
+      { "name": "lemon", "qty": { "amount": 0.5, "unit": "pcs" } },
+      { "name": "butter", "qty": { "amount": 10, "unit": "g" } }
+    ]
+  }
+]

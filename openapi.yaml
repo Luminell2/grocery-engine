@@ -1,0 +1,262 @@
+openapi: 3.0.3
+info:
+  title: Grocery Engine — Shopping tab API
+  version: 0.2.0
+  description: |
+    Live grocery prices for European stores (+ Instacart handoff for US/CA), ingredient matching,
+    budget meal planning and cart handoff. All money values are integers in MINOR units (cents, tiyn...).
+    Generate a client for Swift / Kotlin / Flutter from this file; React Native can use client/shopping-client.ts.
+servers:
+  - url: http://localhost:8787
+paths:
+  /api/stores:
+    get:
+      summary: Supported stores
+      parameters:
+        - { name: country, in: query, schema: { type: string, example: NL }, description: ISO 3166-1 alpha-2 }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/StoreInfo' } } } } }
+  /api/wolt/venues:
+    get:
+      summary: Grocery venues on Wolt around a point
+      parameters:
+        - { name: lat, in: query, required: true, schema: { type: number } }
+        - { name: lon, in: query, required: true, schema: { type: number } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  city: { type: string }
+                  country: { type: string }
+                  venues: { type: array, items: { $ref: '#/components/schemas/WoltVenue' } }
+  /api/wolt/register:
+    post:
+      summary: Make a discovered Wolt venue quotable (store id = wolt-<slug>)
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/WoltVenue' } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/StoreInfo' } } } }
+  /api/list:
+    post:
+      summary: Aggregate meals into one shopping list
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/MealsInput' } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Ingredient' } } } } }
+  /api/quote:
+    post:
+      summary: Priced basket at one store
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MealsInput'
+                - type: object
+                  required: [storeId]
+                  properties:
+                    storeId: { type: string, example: ah-nl }
+                    ctx: { $ref: '#/components/schemas/StoreContext' }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/BasketQuote' } } } }
+  /api/compare:
+    post:
+      summary: Same basket at several stores, cheapest first
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MealsInput'
+                - type: object
+                  properties:
+                    country: { type: string, example: NL }
+                    storeIds: { type: array, items: { type: string } }
+                    ctx: { $ref: '#/components/schemas/StoreContext' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cheapest: { type: string }
+                  quotes:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/BasketQuote'
+                        - type: object
+                          properties:
+                            estimatedTotal: { type: integer, description: total + missing items priced at the store's median line }
+                            coverage: { type: number, description: matched / lines }
+  /api/plan:
+    post:
+      summary: Choose meals for the slots so the basket fits the budget
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [storeId, meals, slots, budget]
+              properties:
+                storeId: { type: string }
+                meals: { type: array, items: { $ref: '#/components/schemas/Meal' } }
+                slots: { type: array, items: { type: string }, example: [Mo Breakfast, Mo Lunch, Mo Dinner] }
+                budget: { type: integer, description: minor units }
+                people: { type: integer, default: 1 }
+                moods: { type: array, items: { type: string }, example: [Speedy Meals] }
+                maxRepeats: { type: integer, default: 2 }
+                excludePantry: { type: boolean, default: false }
+                ctx: { $ref: '#/components/schemas/StoreContext' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  store: { $ref: '#/components/schemas/StoreInfo' }
+                  currency: { type: string }
+                  budget: { type: integer }
+                  total: { type: integer }
+                  fits: { type: boolean }
+                  slots: { type: array, items: { type: object, properties: { slot: { type: string }, mealId: { type: string }, title: { type: string }, estCost: { type: integer } } } }
+                  lines: { type: array, items: { $ref: '#/components/schemas/BasketLine' } }
+                  unpricedIngredients: { type: array, items: { type: string } }
+  /api/cart:
+    post:
+      summary: Order link / product links / share text for a basket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MealsInput'
+                - type: object
+                  required: [storeId]
+                  properties:
+                    storeId: { type: string }
+                    quote: { $ref: '#/components/schemas/BasketQuote' }
+                    provider: { type: string, enum: [instacart, pepesto-predirect, pepesto-checkout, store-links, text] }
+                    locale: { type: string, example: en-GB }
+                    title: { type: string }
+                    linkback: { type: string, example: 'myapp://shopping' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  provider: { type: string }
+                  url: { type: string, description: open this to order (Instacart / Pepesto) }
+                  links: { type: array, items: { type: object, properties: { name: { type: string }, packs: { type: integer }, url: { type: string } } } }
+                  text: { type: string, description: share-sheet shopping list }
+                  note: { type: string }
+components:
+  schemas:
+    Quantity:
+      type: object
+      required: [amount, unit]
+      properties:
+        amount: { type: number }
+        unit: { type: string, enum: [g, ml, pcs] }
+    Ingredient:
+      type: object
+      required: [name, qty]
+      properties:
+        name: { type: string, example: cherry tomatoes }
+        qty: { $ref: '#/components/schemas/Quantity' }
+        category: { type: string }
+        pantry: { type: boolean }
+    Meal:
+      type: object
+      required: [id, title, servings, ingredients]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        servings: { type: integer }
+        tags: { type: array, items: { type: string } }
+        kcal: { type: integer }
+        minutes: { type: integer }
+        ingredients: { type: array, items: { $ref: '#/components/schemas/Ingredient' } }
+    MealsInput:
+      type: object
+      properties:
+        meals: { type: array, items: { $ref: '#/components/schemas/Meal' } }
+        ingredients: { type: array, items: { $ref: '#/components/schemas/Ingredient' }, description: alternative to meals }
+        people: { type: integer }
+    StoreContext:
+      type: object
+      properties:
+        postalCode: { type: string, description: REWE market selection }
+        branchId: { type: string, description: Mercadona warehouse / Silpo branch / S-kaupat store }
+        lat: { type: number }
+        lon: { type: number }
+    StoreInfo:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        chain: { type: string }
+        country: { type: string }
+        currency: { type: string }
+        language: { type: string }
+        cart: { type: string, enum: [api, deeplink, list] }
+        source: { type: string, enum: [live, dataset, crowd, aggregator] }
+        notes: { type: string }
+    Offer:
+      type: object
+      properties:
+        storeId: { type: string }
+        productId: { type: string }
+        name: { type: string }
+        brand: { type: string }
+        price: { type: integer, description: one pack, minor units }
+        regularPrice: { type: integer }
+        currency: { type: string }
+        pack: { $ref: '#/components/schemas/Quantity' }
+        unitPrice: { type: integer, description: per kg / l / piece }
+        url: { type: string }
+        image: { type: string }
+        source: { type: string }
+    BasketLine:
+      type: object
+      properties:
+        ingredient: { $ref: '#/components/schemas/Ingredient' }
+        offer: { $ref: '#/components/schemas/Offer' }
+        packs: { type: integer }
+        cost: { type: integer }
+        usedFraction: { type: number }
+        alternatives: { type: array, items: { $ref: '#/components/schemas/Offer' } }
+        substitutedWith: { type: string }
+        status: { type: string, enum: [matched, not_found, error] }
+    BasketQuote:
+      type: object
+      properties:
+        store: { $ref: '#/components/schemas/StoreInfo' }
+        currency: { type: string }
+        total: { type: integer, description: shelf price of full packs }
+        usedCost: { type: integer, description: pro-rata cost of what the recipes consume }
+        lines: { type: array, items: { $ref: '#/components/schemas/BasketLine' } }
+        matched: { type: integer }
+        missing: { type: integer }
+    WoltVenue:
+      type: object
+      properties:
+        slug: { type: string }
+        name: { type: string }
+        country: { type: string }
+        countryPath: { type: string }
+        city: { type: string }
+        currency: { type: string }

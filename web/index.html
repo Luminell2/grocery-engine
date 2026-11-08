@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shopping Tab</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --bg: #f3faf3; --card: #ffffff; --ink: #14201a; --muted: #6b7a72; --line: #e3ece5;
+    --green: #1f9d3a; --green-2: #2fbf55; --green-soft: #e6f6e9; --warn: #c2410c; --chip: #eef2ef;
+    --shadow: 0 1px 2px rgba(20,32,26,.05), 0 4px 16px rgba(20,32,26,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg:#0e1511; --card:#16201a; --ink:#e7efe9; --muted:#93a39a; --line:#24322a; --green-soft:#183222; --chip:#1d2a22; --shadow:none; }
+  }
+  :root[data-theme="dark"] { --bg:#0e1511; --card:#16201a; --ink:#e7efe9; --muted:#93a39a; --line:#24322a; --green-soft:#183222; --chip:#1d2a22; --shadow:none; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif; }
+  .app { max-width: 440px; margin: 0 auto; padding: 16px 16px 120px; }
+  h1 { font-size: 26px; margin: 4px 0 2px; letter-spacing: -.02em; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .card { background: var(--card); border-radius: 20px; box-shadow: var(--shadow); padding: 16px; margin-top: 14px; }
+  .hero { background: linear-gradient(135deg, var(--green), var(--green-2)); color: #fff; }
+  .hero .label { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+  .hero .big { font-size: 40px; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .hero .big small { font-size: 20px; font-weight: 600; opacity: .85; }
+  .bar { height: 8px; border-radius: 99px; background: rgba(255,255,255,.3); overflow: hidden; margin: 8px 0 10px; }
+  .bar > i { display: block; height: 100%; background: #fff; border-radius: 99px; transition: width .4s; }
+  .bar.over > i { background: #ffd6c2; }
+  .pill { display: inline-flex; gap: 6px; align-items: center; background: rgba(255,255,255,.18); border-radius: 99px; padding: 6px 12px; font-size: 13px; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .between { justify-content: space-between; }
+  select, input[type=number], input[type=text] { font: inherit; color: var(--ink); background: var(--chip); border: 0; border-radius: 12px; padding: 9px 12px; min-width: 0; }
+  .days { display: flex; gap: 6px; margin-top: 16px; overflow-x: auto; scrollbar-width: none; }
+  .day { flex: 1 0 44px; height: 44px; border-radius: 50%; border: 0; background: var(--chip); color: var(--ink); font: 600 14px inherit; cursor: pointer; }
+  .day.on { background: var(--green); color: #fff; }
+  .meal { display: flex; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .meal:last-child { border-bottom: 0; }
+  .meal .slot { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .meal .t { font-weight: 700; }
+  .tag { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 99px; background: var(--green-soft); color: var(--green); margin-top: 2px; }
+  .meal .cost { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .emoji { width: 52px; height: 52px; border-radius: 14px; background: var(--green-soft); display: grid; place-items: center; font-size: 26px; flex: none; }
+  h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 18px 4px 6px; }
+  .item { display: flex; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .item:last-child { border-bottom: 0; }
+  .item .n { font-weight: 600; }
+  .item .p { font-size: 12px; color: var(--muted); }
+  .item .price { margin-left: auto; text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+  .item .price small { display: block; font-weight: 500; color: var(--muted); font-size: 11px; }
+  .item.done .n { text-decoration: line-through; color: var(--muted); }
+  .item.miss .n { color: var(--warn); }
+  .chk { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); flex: none; cursor: pointer; display: grid; place-items: center; background: none; color: #fff; }
+  .item.done .chk { background: var(--green); border-color: var(--green); }
+  .btn { border: 0; border-radius: 16px; padding: 14px 16px; font: 700 15px inherit; cursor: pointer; background: var(--green); color: #fff; }
+  .btn.ghost { background: var(--chip); color: var(--ink); }
+  .btn:disabled { opacity: .5; cursor: wait; }
+  .footer { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, var(--bg) 30%); }
+  .footer .inner { max-width: 440px; margin: 0 auto; display: flex; gap: 8px; }
+  .footer .btn { flex: 1; }
+  .cmp { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .cmp:last-child { border-bottom: 0; }
+  .cmp .best { font-size: 11px; background: var(--green); color: #fff; border-radius: 99px; padding: 2px 8px; }
+  .cmp .tot { margin-left: auto; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .muted { color: var(--muted); }
+  .note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .sheet { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: none; align-items: flex-end; z-index: 10; }
+  .sheet.on { display: flex; }
+  .sheet .panel { background: var(--card); width: 100%; max-width: 440px; margin: 0 auto; border-radius: 22px 22px 0 0; padding: 18px 16px 28px; max-height: 80vh; overflow: auto; }
+  a { color: var(--green); }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="row between">
+    <div>
+      <div class="sub">Good morning,</div>
+      <h1>Shopping</h1>
+    </div>
+    <select id="store" aria-label="Store"></select>
+  </div>
+
+  <div class="card hero">
+    <div class="row between"><span class="label">Est. cost this week</span><span class="label" id="storeLabel"></span></div>
+    <div class="big"><span id="weekTotal">—</span> <small>/ <span id="budgetLabel"></span></small></div>
+    <div class="bar" id="bar"><i style="width:0"></i></div>
+    <div class="row between">
+      <span class="pill" id="savedPill">Pricing…</span>
+      <label class="pill">Budget <input id="budget" type="number" min="1" step="1" style="width:64px;padding:2px 6px;border-radius:8px;background:rgba(255,255,255,.25);color:#fff"></label>
+    </div>
+  </div>
+
+  <div class="days" id="days"></div>
+
+  <div class="card" id="meals"></div>
+
+  <div class="row between" style="margin-top:6px">
+    <h2 id="listTitle">Grocery list</h2>
+    <button class="btn ghost" id="cmpBtn" style="padding:8px 12px;font-size:13px">Compare stores</button>
+  </div>
+  <div id="list"></div>
+  <p class="note" id="srcNote"></p>
+</div>
+
+<div class="footer"><div class="inner">
+  <button class="btn ghost" id="planBtn">Auto-plan to budget</button>
+  <button class="btn" id="orderBtn">Order</button>
+</div></div>
+
+<div class="sheet" id="sheet"><div class="panel" id="sheetBody"></div></div>
+
+<script>
+const API = location.origin.startsWith('http') ? '' : 'http://localhost:8787';
+const DAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+const SLOTS = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+const EMOJI = { 'falafel-wraps': '🌯', 'homemade-burgers': '🍔', 'egg-fried-rice': '🍳', 'harissa-vegetables': '🥘', 'buffalo-tofu-wraps': '🌮', 'pasta-bolognese': '🍝', 'chicken-rice-bowl': '🍗', 'overnight-oats': '🥣', 'lentil-soup': '🍲', 'salmon-potatoes': '🐟' };
+const CURRENCY_BUDGET = { EUR: 90, GBP: 80, PLN: 380, UAH: 3600, KZT: 45000, CHF: 110, SEK: 1000, DKK: 700, HUF: 36000, RON: 450, RSD: 10500 }; // 28 meals / week
+
+const state = { meals: [], stores: [], store: 'lidl-nl', day: 0, plan: {}, quotes: {}, done: new Set(), budget: 90 };
+
+function store() { return state.stores.find((s) => s.id === state.store); }
+function money(minor, cur) { return new Intl.NumberFormat('en-IE', { style: 'currency', currency: cur, maximumFractionDigits: ['KZT', 'UAH', 'HUF', 'RSD'].includes(cur) ? 0 : 2 }).format(minor / 100); }
+function fmtQty(q) { if (!q) return ''; if (q.unit === 'pcs') return `${+q.amount.toFixed(2)} pcs`; return q.amount >= 1000 ? `${+(q.amount / 1000).toFixed(2)} ${q.unit === 'g' ? 'kg' : 'l'}` : `${Math.round(q.amount)} ${q.unit}`; }
+async function api(path, body) {
+  const r = await fetch(API + path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {});
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+}
+function esc(s) { return String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+function defaultPlan() {
+  // Meals "arrive from another menu" in the real app; here a fixed week.
+  const ids = state.meals.map((m) => m.id);
+  const week = {};
+  for (let d = 0; d < 7; d++) week[d] = [0, 1, 2, 3].map((k) => ids[(d * 3 + k) % ids.length]);
+  week[0] = ['falafel-wraps', 'homemade-burgers', 'egg-fried-rice', 'harissa-vegetables'];
+  return week;
+}
+
+function dayMeals(d) { return (state.plan[d] || []).map((id) => state.meals.find((m) => m.id === id)).filter(Boolean); }
+
+async function priceDay(d) {
+  const key = `${state.store}|${d}|${state.plan[d].join(',')}`;
+  if (!state.quotes[key]) state.quotes[key] = api('/api/quote', { storeId: state.store, meals: dayMeals(d) });
+  return state.quotes[key];
+}
+
+function renderDays() {
+  document.getElementById('days').innerHTML = DAYS.map((d, i) => `<button class="day ${i === state.day ? 'on' : ''}" data-d="${i}">${d}</button>`).join('');
+}
+
+async function mealCosts(quote) {
+  // Pro-rata cost per meal: share of each line's cost by the meal's share of the quantity.
+  const out = {};
+  for (const m of dayMeals(state.day)) {
+    let c = 0;
+    for (const ing of m.ingredients) {
+      const line = quote.lines.find((l) => l.ingredient.name === ing.name);
+      if (!line || !line.offer) continue;
+      const share = Math.min(1, ing.qty.amount / (line.ingredient.qty.amount || 1));
+      c += line.cost * (line.usedFraction ?? 1) * share;
+    }
+    out[m.id] = Math.round(c);
+  }
+  return out;
+}
+
+async function render() {
+  renderDays();
+  const s = store();
+  document.getElementById('storeLabel').textContent = s ? `${s.name} · ${s.country}` : '';
+  document.getElementById('budgetLabel').textContent = money(state.budget * 100, s.currency);
+  const mealsEl = document.getElementById('meals');
+  const listEl = document.getElementById('list');
+  mealsEl.innerHTML = dayMeals(state.day).map((m, i) => `
+    <div class="meal"><div class="emoji">${EMOJI[m.id] || '🍽️'}</div>
+      <div><div class="slot">${SLOTS[i] || 'Meal'}</div><div class="t">${esc(m.title)}</div>${(m.tags || []).map((t) => `<span class="tag">${esc(t)}</span>`).join(' ')}
+      <div class="sub">${m.minutes || '—'} min · ${m.kcal || '—'} kcal</div></div>
+      <div class="cost" data-meal="${m.id}"><span class="spinner"></span></div></div>`).join('');
+  listEl.innerHTML = `<div class="card"><span class="spinner"></span> Fetching live prices from ${esc(s.name)}…</div>`;
+
+  let quote;
+  const forKey = `${state.store}|${state.day}`;
+  try { quote = await priceDay(state.day); } catch (e) { listEl.innerHTML = `<div class="card">⚠️ ${esc(e.message)}</div>`; return; }
+  if (forKey !== `${state.store}|${state.day}`) return; // stale response
+  const costs = await mealCosts(quote);
+  for (const [id, c] of Object.entries(costs)) { const el = mealsEl.querySelector(`[data-meal="${id}"]`); if (el) el.textContent = money(c, quote.currency); }
+
+  const groups = {};
+  for (const l of quote.lines) (groups[l.ingredient.category || 'Other'] ||= []).push(l);
+  const bought = quote.lines.filter((l) => state.done.has(`${state.day}|${l.ingredient.name}`)).length;
+  document.getElementById('listTitle').textContent = `Grocery list · ${bought}/${quote.lines.length}`;
+  listEl.innerHTML = Object.entries(groups).map(([g, lines]) => `<h2>${esc(g)}</h2><div class="card" style="margin-top:0;padding:4px 16px">` + lines.map((l) => {
+    const k = `${state.day}|${l.ingredient.name}`;
+    const done = state.done.has(k);
+    if (!l.offer) return `<div class="item miss"><button class="chk" data-k="${esc(k)}"></button><div><div class="n">${esc(l.ingredient.name)}</div><div class="p">${fmtQty(l.ingredient.qty)} needed · not found at ${esc(s.name)}</div></div><div class="price muted">—</div></div>`;
+    const name = l.offer.url ? `<a href="${esc(l.offer.url)}" target="_blank" rel="noopener">${esc(l.offer.name)}</a>` : esc(l.offer.name);
+    return `<div class="item ${done ? 'done' : ''}"><button class="chk" data-k="${esc(k)}">${done ? '✓' : ''}</button>
+      <div style="min-width:0"><div class="n">${esc(l.ingredient.name[0].toUpperCase() + l.ingredient.name.slice(1))}${l.ingredient.pantry ? ' <span class="tag">pantry</span>' : ''}${l.substitutedWith ? ` <span class="tag">→ ${esc(l.substitutedWith)}</span>` : ''}</div>
+      <div class="p">${name}</div><div class="p">${fmtQty(l.ingredient.qty)} needed${l.offer.pack ? ` · pack ${fmtQty(l.offer.pack)}` : ''}</div></div>
+      <div class="price">${l.packs > 1 ? `${l.packs}× ` : ''}${money(l.cost, quote.currency)}${l.offer.regularPrice && l.offer.regularPrice > l.offer.price ? `<small><s>${money(l.offer.regularPrice * l.packs, quote.currency)}</s></small>` : ''}</div></div>`;
+  }).join('') + '</div>').join('');
+  document.getElementById('srcNote').textContent = `${quote.matched}/${quote.lines.length} items matched · ${({ dataset: 'daily dataset', aggregator: 'price-comparison aggregator', live: 'live store API' })[s.source] || s.source} · ${quote.tookMs} ms · ${s.notes || ''}`;
+  renderWeek();
+}
+
+async function renderWeek() {
+  // Week estimate = sum of daily used-cost (what the recipes consume), like the competitor's "Est. cost".
+  const s = store();
+  const forStore = state.store;
+  document.getElementById('weekTotal').textContent = '…';
+  const days = await Promise.allSettled(DAYS.map((_, d) => priceDay(d)));
+  if (forStore !== state.store) return; // user switched store meanwhile
+  const ok = days.filter((d) => d.status === 'fulfilled').map((d) => d.value);
+  const used = ok.reduce((t, q) => t + q.usedCost, 0);
+  const shelf = ok.reduce((t, q) => t + q.total, 0);
+  document.getElementById('weekTotal').textContent = money(used, s.currency);
+  const pct = Math.min(100, (used / (state.budget * 100)) * 100);
+  const bar = document.getElementById('bar');
+  bar.firstElementChild.style.width = pct + '%';
+  bar.classList.toggle('over', used > state.budget * 100);
+  const diff = state.budget * 100 - used;
+  document.getElementById('savedPill').textContent = diff >= 0 ? `✓ ${money(diff, s.currency)} under budget` : `⚠ ${money(-diff, s.currency)} over budget`;
+  document.getElementById('savedPill').title = `Shelf price if each day bought separately: ${money(shelf, s.currency)}`;
+}
+
+function openSheet(html) { document.getElementById('sheetBody').innerHTML = html; document.getElementById('sheet').classList.add('on'); }
+document.getElementById('sheet').addEventListener('click', (e) => { if (e.target.id === 'sheet') e.currentTarget.classList.remove('on'); });
+
+document.getElementById('days').addEventListener('click', (e) => { const d = e.target.dataset.d; if (d != null) { state.day = +d; render(); } });
+document.getElementById('list').addEventListener('click', (e) => {
+  const b = e.target.closest('.chk'); if (!b) return;
+  const k = b.dataset.k; state.done.has(k) ? state.done.delete(k) : state.done.add(k); render();
+});
+document.getElementById('store').addEventListener('change', (e) => {
+  state.store = e.target.value; state.budget = CURRENCY_BUDGET[store().currency] ?? 90;
+  document.getElementById('budget').value = state.budget; render();
+});
+document.getElementById('budget').addEventListener('change', (e) => { state.budget = Math.max(1, +e.target.value || 1); render(); });
+
+document.getElementById('cmpBtn').addEventListener('click', async () => {
+  const s = store();
+  openSheet(`<h2 style="margin-top:0">Compare ${esc(DAYS[state.day])} basket · ${esc(s.country)}</h2><div><span class="spinner"></span> Pricing every ${esc(s.country)} store…</div>`);
+  try {
+    const r = await api('/api/compare', { country: s.country, meals: dayMeals(state.day) });
+    openSheet(`<h2 style="margin-top:0">Compare ${esc(DAYS[state.day])} basket · ${esc(s.country)}</h2>` + r.quotes.map((q, i) => `
+      <div class="cmp" data-id="${q.store.id}"><div><b>${esc(q.store.name)}</b> ${i === 0 ? '<span class="best">cheapest</span>' : ''}<div class="sub">${q.matched}/${q.lines.length} items · ${q.store.source}</div></div>
+      <div class="tot">${money(q.total, q.currency)}${q.missing ? `<div class="sub" style="text-align:right">≈ ${money(q.estimatedTotal, q.currency)} est.</div>` : ''}</div></div>`).join('') + '<p class="note">Tap a store to switch. Totals are shelf prices for full packs.</p>');
+  } catch (e) { openSheet(`⚠️ ${esc(e.message)}`); }
+});
+document.getElementById('sheetBody').addEventListener('click', (e) => {
+  const row = e.target.closest('.cmp'); if (!row) return;
+  state.store = row.dataset.id; document.getElementById('store').value = state.store;
+  document.getElementById('sheet').classList.remove('on'); render();
+});
+
+document.getElementById('planBtn').addEventListener('click', async (e) => {
+  const btn = e.currentTarget; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Planning…';
+  const s = store();
+  try {
+    const slots = DAYS.flatMap((d) => SLOTS.slice(0, 3).map((x) => `${d} ${x}`));
+    const r = await api('/api/plan', { storeId: s.id, meals: state.meals, slots, budget: state.budget * 100, maxRepeats: 3, excludePantry: true });
+    for (let d = 0; d < 7; d++) state.plan[d] = r.slots.slice(d * 3, d * 3 + 3).map((x) => x.mealId);
+    state.quotes = {};
+    openSheet(`<h2 style="margin-top:0">Week planned at ${esc(s.name)}</h2><p><b>${money(r.total, r.currency)}</b> for ${slots.length} meals · budget ${money(r.budget, r.currency)} ${r.fits ? '✅ fits' : '⚠️ over'}</p>
+      <p class="note">Meals chosen to share ingredients (one bag of rice / carrots across several recipes) and to minimise the real basket price with pack sizes.</p>
+      ${r.slots.map((x) => `<div class="cmp"><span>${esc(x.slot)}</span><span class="tot" style="font-weight:600">${esc(x.title)}</span></div>`).join('')}`);
+    render();
+  } catch (err) { openSheet(`⚠️ ${esc(err.message)}`); }
+  btn.disabled = false; btn.textContent = 'Auto-plan to budget';
+});
+
+document.getElementById('orderBtn').addEventListener('click', async () => {
+  const s = store();
+  openSheet(`<h2 style="margin-top:0">Order from ${esc(s.name)}</h2><span class="spinner"></span>`);
+  try {
+    const quote = await priceDay(state.day);
+    const [primary, text] = await Promise.all([
+      api('/api/cart', { storeId: s.id, quote }),
+      api('/api/cart', { storeId: s.id, quote, provider: 'text' }),
+    ]);
+    let html = `<h2 style="margin-top:0">Order from ${esc(s.name)}</h2>`;
+    if (primary.url) html += `<a class="btn" style="display:block;text-align:center;text-decoration:none" href="${esc(primary.url)}" target="_blank" rel="noopener">Add ${quote.matched} items to cart →</a><p class="note">${esc(primary.provider)} · ${esc(primary.note || '')}</p>`;
+    if (primary.links) html += `<p class="note">${esc(primary.note)}</p>` + primary.links.map((l) => `<div class="cmp"><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)}</a><span class="tot">${l.packs}×</span></div>`).join('');
+    html += `<h2>Share list</h2><pre style="white-space:pre-wrap;font:13px/1.5 ui-monospace,monospace;background:var(--chip);padding:12px;border-radius:12px">${esc(text.text)}</pre>`;
+    openSheet(html);
+  } catch (e) { openSheet(`⚠️ ${esc(e.message)}`); }
+});
+
+(async () => {
+  const [meals, stores] = await Promise.all([fetch(API + '/meals.json').then((r) => r.json()), api('/api/stores')]);
+  state.meals = meals; state.stores = stores; state.plan = defaultPlan();
+  const byCountry = {};
+  for (const s of stores) (byCountry[s.country] ||= []).push(s);
+  document.getElementById('store').innerHTML = Object.entries(byCountry).map(([c, ss]) => `<optgroup label="${c}">${ss.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`).join('')}</optgroup>`).join('');
+  document.getElementById('store').value = state.store;
+  document.getElementById('budget').value = state.budget;
+  render();
+})();
+</script>
+</body>
+</html>
